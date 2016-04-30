@@ -1,0 +1,30 @@
+#!/bin/bash -eu
+
+source /etc/jelastic/environment
+
+mkdir -p ${OPENSHIFT_WILDFLY_DIR}/{pid,logs}
+
+/sbin/iptables -t nat -I PREROUTING -p tcp -m tcp --dport 4949 -j REDIRECT --to-ports 9990
+/sbin/iptables -t nat -I PREROUTING -p tcp -m tcp --dport 4848 -j REDIRECT --to-ports 9993
+/sbin/iptables -t nat -I PREROUTING -p tcp -m tcp --dport 443 -j REDIRECT --to-ports 8443
+service iptables save
+
+[ -f ${OPENSHIFT_WILDFLY_DIR}/versions/${Version}/.jboss-cli-history ] || touch ${OPENSHIFT_WILDFLY_DIR}/versions/${Version}/.jboss-cli-history
+
+if [ ! -e ${OPENSHIFT_WILDFLY_DIR}/versions/${Version}/standalone/configuration/server.keystore ]
+then
+cd /usr/java/latest/bin;
+keypass=`tr -cd '[:alnum:]' < /dev/urandom | fold -w30 | head -n1`;
+./keytool -genkeypair -alias serverkey -keyalg RSA -keysize 2048 -validity 7360 -keystore server.keystore -keypass $keypass -storepass $keypass -dname "cn=Server Administrator,o=Acme,c=GB";
+mv /usr/java/latest/bin/server.keystore ${OPENSHIFT_WILDFLY_DIR}/versions/${Version}/standalone/configuration/;
+chown jelastic:jelastic ${OPENSHIFT_WILDFLY_DIR}/versions/${Version}/standalone/configuration/server.keystore;
+sed -i s/theremustbethesslcertpass/$keypass/ ${OPENSHIFT_WILDFLY_DIR}/versions/${Version}/standalone/configuration/standalone.xml;
+fi
+
+if [ -d "${OPENSHIFT_WILDFLY_DIR}/.ssh" ] ; then
+    cp -r /opt/repo/.ssh /opt/repo/home/
+fi
+
+[ -f "${OPENSHIFT_WILDFLY_DIR}/.bash_profile" ] && cp ${OPENSHIFT_WILDFLY_DIR}/.bash_profile ${OPENSHIFT_WILDFLY_DIR}/home/ ;
+[ -f "${OPENSHIFT_WILDFLY_DIR}/.bash_history" ] && cp ${OPENSHIFT_WILDFLY_DIR}/.bash_history ${OPENSHIFT_WILDFLY_DIR}/home/ ;
+[ -f "${OPENSHIFT_WILDFLY_DIR}/.profile" ] && cp ${OPENSHIFT_WILDFLY_DIR}/.profile ${OPENSHIFT_WILDFLY_DIR}/home/ ;

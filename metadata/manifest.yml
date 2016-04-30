@@ -1,0 +1,117 @@
+Name: wildfly
+Cartridge-Short-Name: WILDFLY
+Display-Name: WildFly Application Server 8.2.0.Final
+Description: "The leading open source Java EE7 application server for enterprise Java applications. Popular development frameworks include Seam, CDI, Weld, and Spring."
+Version: '8.2'
+License: LGPL
+License-Url: http://www.gnu.org/copyleft/lesser.txt
+Source-Url: https://github.com/jelastic-public-cartridges/jelastic-wildfly8-cartridge.git
+Vendor: WildFly
+Cartridge-Version: '0.0.5'
+Cartridge-Vendor: wildfly
+Categories:
+  - service
+  - web_framework
+  - java
+  - wildfly
+  - java_ee_7
+Website: http://www.wildfly.org
+Help-Topics:
+  "Developer Center": https://www.openshift.com/developers
+Cart-Data:
+  - Key: OPENSHIFT_WILDFLY_LOG_DIR
+    Type: environment
+    Description: "Directory to store application log files."
+  - Key: OPENSHIFT_TMP_DIR
+    Type: environment
+    Description: "Directory to store application temporary files."
+  - Key: OPENSHIFT_REPO_DIR
+    Type: environment
+    Description: "Application root directory where application files reside. This directory is reset every time you do a git-push"
+  - Key: OPENSHIFT_WILDFLY_HTTP_PORT
+    Type: environment
+    Description: "Internal port to which the web-framework binds to."
+  - Key: OPENSHIFT_WILDFLY_IP
+    Type: environment
+    Description: "Internal IP to which the web-framework binds to."
+  - Key: OPENSHIFT_APP_DNS
+    Type: environment
+    Description: "Fully qualified domain name for the application."
+  - Key: OPENSHIFT_APP_NAME
+    Type: environment
+    Description: "Application name"
+  - Key: OPENSHIFT_DATA_DIR
+    Type: environment
+    Description: "Directory to store application data files. Preserved across git-pushes. Not shared across gears."
+  - Key: OPENSHIFT_APP_UUID
+    Type: environment
+    Description: "Unique ID which identified the application. Does not change between gears."
+  - Key: OPENSHIFT_GEAR_UUID
+    Type: environment
+    Description: "Unique ID which identified the gear. This value changes between gears."
+Provides:
+  - wildfly-8
+  - "wildfly"
+  - wildfly-standalone
+Publishes:
+  publish-http-url:
+    Type: "NET_TCP:httpd-proxy-info"
+  publish-wildfly-cluster:
+    Type: NET_TCP:wildfly-cluster-info
+Subscribes:
+  set-env:
+    Type: "ENV:*"
+    Required: false
+  set-mysql-connection-info:
+    Type: "NET_TCP:db:mysql"
+    Required : false
+  set-postgres-connection-info:
+    Type: "NET_TCP:db:postgres"
+    Required : false
+  set-doc-url:
+    Type: "STRING:urlpath"
+    Required : false
+  set-generic-java:
+    Type: "ENV:NET_TCP:generic-java"
+  set-wildfly-cluster:
+    Type: NET_TCP:wildfly-cluster-info
+Scaling:
+  Min: 1
+  Max: -1
+Endpoints:
+  - Private-IP-Name:     IP
+    Private-Port-Name:   HTTP_PORT
+    Private-Port:        8080
+    Public-Port-Name:    HTTP_PROXY_PORT
+    Protocols:
+    - http
+    - ws
+    Mappings:
+    - Frontend: ''
+      Backend: ''
+      Options:
+        websocket: true
+    - Frontend: /health
+      Backend: ''
+      Options:
+        health: true
+  - Private-IP-Name:     IP
+    Private-Port-Name: CLUSTER_PORT
+    Private-Port: 7600
+    Public-Port-Name: CLUSTER_PROXY_PORT
+  - Private-IP-Name: IP
+    Private-Port-Name: MANAGEMENT_HTTP_PORT
+    Private-Port: 9990
+  - Private-IP-Name: IP
+    Private-Port-Name: MANAGEMENT_HTTPS_PORT
+    Private-Port: 9993
+  - Private-IP-Name:   AJP_HOST
+    Private-Port-Name: AJP_PORT
+    Private-Port:      8009
+    Public-Port-Name:  AJP_PROXY_PORT
+  - Private-IP-Name: IP
+    Private-Port-Name: HTTPS_PORT
+    Private-Port: 8443
+    Public-Port-Name: APP_HTTPS_PORT
+Additional-Control-Actions:
+    - threaddump
