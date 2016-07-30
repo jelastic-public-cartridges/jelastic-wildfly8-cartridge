@@ -39,6 +39,11 @@
                 <authorization map-groups-to-roles="false">
                     <properties path="mgmt-groups.properties" relative-to="jboss.server.config.dir"/>
                 </authorization>
+		<server-identities>
+                <ssl>
+                    <keystore path="server.keystore" relative-to="jboss.server.config.dir" keystore-password="theremustbethesslcertpass" alias="serverkey"/>
+                </ssl>
+                </server-identities>
             </security-realm>
             <security-realm name="ApplicationRealm">
                 <authentication>
@@ -64,9 +69,12 @@
             </logger>
         </audit-log>
         <management-interfaces>
-            <http-interface security-realm="ManagementRealm" http-upgrade-enabled="true">
-                <socket-binding http="management-http"/>
-            </http-interface>
+		<native-interface security-realm="ManagementRealm">
+                	<socket-binding native="management-native"/>
+            	</native-interface>
+            	<http-interface security-realm="ManagementRealm" http-upgrade-enabled="true">
+                	<socket-binding http="management-http" https="management-https"/>
+            	</http-interface>
         </management-interfaces>
         <access-control provider="simple">
             <role-mapping>
