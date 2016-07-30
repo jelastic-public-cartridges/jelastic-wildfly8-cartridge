@@ -23,7 +23,7 @@ XML_CONFIG_FILES=("standalone.xml" "standalone-full.xml" "standalone-ha.xml" "st
 
 for file in "${XML_CONFIG_FILES[@]}"
 do
-    sed -i s/theremustbethesslcertpass/$keypass/ ${OPENSHIFT_JBOSSAS_DIR}/versions/${Version}/standalone/configuration/${file};
+    sed -i s/theremustbethesslcertpass/$keypass/ ${OPENSHIFT_WILDFLY_DIR}/versions/${Version}/standalone/configuration/${file};
 done
 
 fi
