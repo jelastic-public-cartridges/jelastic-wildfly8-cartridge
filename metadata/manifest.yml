@@ -78,6 +78,7 @@ Subscribes:
 Scaling:
   Min: 1
   Max: -1
+
 Endpoints:
 - Private-IP-Name: IP
   Private-Port-Name: HTTP_PORT
@@ -100,10 +101,6 @@ Endpoints:
     Options:
       health: true
 - Private-IP-Name: IP
-  Private-Port-Name: CLUSTER_PORT
-  Private-Port: 7600
-  Public-Port-Name: CLUSTER_PROXY_PORT
-- Private-IP-Name: IP
   Private-Port-Name: MESSAGING_PORT
   Private-Port: 5445
   Public-Port-Name: MESSAGING_PROXY_PORT
@@ -125,43 +122,12 @@ Endpoints:
   Private-Port: 9993
 - Private-IP-Name:   AJP_HOST
   Private-Port-Name: AJP_PORT
-  Private-Port:      8009
+  Private-Port: 8009
   Public-Port-Name:  AJP_PROXY_PORT
 - Private-IP-Name: IP
   Private-Port-Name: HTTPS_PORT
   Private-Port: 8443
   Public-Port-Name: APP_HTTPS_PORT
-- Private-IP-Name: IP
-  Private-Port-Name: THX_RECOVERY_PORT
-  Private-Port: 4712
-  Public-Port-Name: THX_RECOVERY_PORT
-- Private-IP-Name: IP
-  Private-Port-Name: THX_STATUS_PORT
-  Private-Port: 4713
-  Public-Port-Name: THX_STATUS_PORT
-- Private-IP-Name: IP
-  Private-Port-Name: JACORB_PORT
-  Private-Port: 3528
-  Public-Port-Name: JACORB_PORT
-- Private-IP-Name: IP
-  Private-Port-Name: JACORB_SSL_PORT
-  Private-Port: 3529
-  Public-Port-Name: JACORB_SSL_PORT
-- Private-IP-Name: IP
-  Private-Port-Name: OSGI_PORT
-  Private-Port: 8090
-  Public-Port-Name: OSGI_PORT
-- Private-IP-Name: IP
-  Private-Port-Name: JGROUPS_UDP_PORT
-  Private-Port: 55200
-  Public-Port-Name: JGROUPS_UDP_PORT
-- Private-IP-Name: IP
-  Private-Port-Name: JGROUPS_TCP_FD_PORT
-  Private-Port: 57600
-  Public-Port-Name: JGROUPS_TCP_FD_PORT
-- Private-IP-Name: IP
-  Private-Port-Name: JGROUPS_UDP_FD_PORT
-  Private-Port: 54200
-  Public-Port-Name: JGROUPS_UDP_FD_PORT
+
 Additional-Control-Actions:
     - threaddump
