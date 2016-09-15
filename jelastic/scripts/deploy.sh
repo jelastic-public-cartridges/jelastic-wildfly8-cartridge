@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Simple deploy and undeploy scenarios for Wildfly8
+# Simple deploy and undeploy scenarios for Wildfly9
 
 WGET=$(which wget);
 
@@ -12,9 +12,12 @@ function _deploy(){
      [ -f "${WEBROOT}/${context}.ear.undeployed" ] && mv ${WEBROOT}/${context}.ear.undeployed ${WEBROOT}/${context}.ear.deployed
      local download_dir=$(mktemp -d)
      $WGET --no-check-certificate --content-disposition -P "$download_dir" "$package_url";
-     local app_filename=$(ls "$download_dir")
-     [[ "$app_filename" =~ (.*.ear) ]] && mv -f "/${download_dir}/${app_filename}" "${WEBROOT}/${context}.ear" || mv -f "/${download_dir}/${app_filename}" "${WEBROOT}/${context}.war"
-     rm -rf "$download_dir"
+     local app_filename=$(ls -1 "$download_dir")
+     cd "$download_dir";
+     [[ "$app_filename" =~ (.*.ear) ]] && mv -f "${app_filename}" "${context}.ear" || mv -f "${app_filename}" "${context}.war"
+     chown jelastic:jelastic ${context}.*;
+     mv ${context}.* ${WEBROOT};
+     cd /; rm -rf "$download_dir";
 }
 
 function _undeploy(){
