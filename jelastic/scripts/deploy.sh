@@ -13,11 +13,13 @@ function _deploy(){
      local download_dir=$(mktemp -d)
      $WGET --no-check-certificate --content-disposition -P "$download_dir" "$package_url";
      local app_filename=$(ls -1 "$download_dir")
+     set +f;
      cd "$download_dir";
      [[ "$app_filename" =~ (.*.ear) ]] && mv -f "${app_filename}" "${context}.ear" || mv -f "${app_filename}" "${context}.war"
      chown jelastic:jelastic ${context}.*;
      mv ${context}.* ${WEBROOT};
      cd /; rm -rf "$download_dir";
+     set -f;
 }
 
 function _undeploy(){
