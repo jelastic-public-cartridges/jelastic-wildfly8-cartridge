@@ -18,7 +18,6 @@ function ensureFileCanBeDownloaded(){
 
 function getPackageName() {
     if [ -f "$package_url" ]; then
-        echo test1
         package_name="$package_url";
     elif [[ "${package_url}" =~ file://* ]]; then
         package_name="${package_url:7}"
@@ -46,8 +45,8 @@ function _deploy(){
      download_dir=$(mktemp -d)
      getPackageName
      set +f;
-     chown jelastic:jelastic "${package_name}"
      [[ "${package_name}" =~ (.*.ear) ]] && cp -f "${package_name}" ${WEBROOT}/"${context}.ear" || cp -f "${package_name}" ${WEBROOT}/"${context}.war"
+     chown -R jelastic:jelastic "${WEBROOT}"
      rm -rf ${download_dir}
      set -f;
 }
