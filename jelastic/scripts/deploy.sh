@@ -1,11 +1,10 @@
 #!/bin/bash
 
-# Simple deploy and undeploy scenarios for Wildfly8
+# Simple deploy and undeploy scenarios for jbossas7
 
 WGET=$(which wget);
 
 source /etc/jelastic/environment
-
 
 function ensureFileCanBeDownloaded(){
     local resource_url=$1;
@@ -18,15 +17,19 @@ function ensureFileCanBeDownloaded(){
 
 function getPackageName() {
     if [ -f "$package_url" ]; then
-        package_name="$package_url";
+        package_name=$(basename "${package_url}")
+        package_path=$(dirname "${package_url}")
     elif [[ "${package_url}" =~ file://* ]]; then
-        package_name="${package_url:7}"
-        [ -f "$package_name" ] || { writeJSONResponseErr "result=>4078" "message=>Error loading file from URL"; die -q; }
+        package_name=$(basename "${package_url:7}")
+        package_path=$(dirname "${package_url:7}")
+        [ -f "${package_path}/${package_name}" ] || { writeJSONResponseErr "result=>4078" "message=>Error loading file from URL"; die -q; }
     else
         ensureFileCanBeDownloaded $package_url;
-        $WGET --no-check-certificate --content-disposition --directory-prefix="$download_dir" $package_url >> $ACTIONS_LOG 2>&1 || { writeJSONResponseErr "result=>4078" "message=>Error loading file from URL"; die -q; }
-        package_name="${download_dir}/$(ls ${download_dir})";
-        [ ! -s "$package_name" ] && {
+        $WGET --no-check-certificate --content-disposition --directory-prefix="${download_dir}" $package_url >> $ACTIONS_LOG 2>&1 || { writeJSONResponseErr "result=>4078" "message=>Error loading file from URL"; die -q; }
+        package_name="$(ls ${download_dir})";
+        package_path=${download_dir};
+        echo $package_name $package_path
+        [ ! -s "${package_path}/${package_name}" ] && {
             set -f
             rm -f "${package_name}";
             set +f
@@ -45,14 +48,17 @@ function _deploy(){
      download_dir=$(mktemp -d)
      getPackageName
      set +f;
-     [[ "${package_name}" =~ (.*.ear) ]] && cp -f "${package_name}" ${WEBROOT}/"${context}.ear" || cp -f "${package_name}" ${WEBROOT}/"${context}.war"
-     chown -R jelastic:jelastic "${WEBROOT}"
+     chown jelastic:jelastic "${package_path}/${package_name}"
+     [[ "${package_path}/${package_name}" =~ (.*.ear) ]] && cp -f "${package_path}/${package_name}" ${WEBROOT}/"${context}.ear" || cp -f "${package_path}/${package_name}" ${WEBROOT}/"${context}.war"
      rm -rf ${download_dir}
+     chown -R jelastic:jelastic "${WEBROOT}"
      set -f;
 }
 
 function _undeploy(){
      [ "x${context}" == "xroot" ] && context="ROOT";
+     set +f;
      rm -rf "${WEBROOT}/${context}.war" "${WEBROOT}/${context}.war.*" 1>/dev/null;
      rm -rf "${WEBROOT}/${context}.ear" "${WEBROOT}/${context}.ear.*" 1>/dev/null;
+     set -f;
 }
