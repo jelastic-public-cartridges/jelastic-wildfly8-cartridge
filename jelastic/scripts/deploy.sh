@@ -28,7 +28,6 @@ function getPackageName() {
         $WGET --no-check-certificate --content-disposition --directory-prefix="${download_dir}" $package_url >> $ACTIONS_LOG 2>&1 || { writeJSONResponseErr "result=>4078" "message=>Error loading file from URL"; die -q; }
         package_name="$(ls ${download_dir})";
         package_path=${download_dir};
-        echo $package_name $package_path
         [ ! -s "${package_path}/${package_name}" ] && {
             set -f
             rm -f "${package_name}";
