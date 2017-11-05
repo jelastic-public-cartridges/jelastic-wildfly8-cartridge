@@ -38,21 +38,4 @@ fi
 [ -f "${OPENSHIFT_WILDFLY_DIR}/.bash_history" ] && cp ${OPENSHIFT_WILDFLY_DIR}/.bash_history ${OPENSHIFT_WILDFLY_DIR}/home/ ;
 [ -f "${OPENSHIFT_WILDFLY_DIR}/.profile" ] && cp ${OPENSHIFT_WILDFLY_DIR}/.profile ${OPENSHIFT_WILDFLY_DIR}/home/ ;
 
-rpm -e --nodeps java6-jelastic &>/dev/null
-
-echo -e "$(find /usr -name libjli.so -printf "%h\n")" > /etc/ld.so.conf.d/java.conf ;
-ldconfig
-
-JAVABIN=$(which java 2>/dev/null)
-[ ! -z "$JAVABIN" ] && {
-    setcap 'cap_net_bind_service=+ep' $(readlink -f "$JAVABIN")
-}
-
-JAVA_BINARIES=$(find /usr/java/* -name java) 
-
-for i in ${JAVA_BINARIES}
-do
-     setcap 'cap_net_bind_service=+ep' ${i}
-done
-
 yum -y install libaio &>/dev/null;
