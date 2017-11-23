@@ -7,3 +7,5 @@ JAVABIN=$(which java 2>/dev/null)
 [ ! -z "$JAVABIN" ] && {
     setcap 'cap_net_bind_service=+ep' $(readlink -f "$JAVABIN")
 }
+
+/sbin/service iptables restart $>/dev/null
